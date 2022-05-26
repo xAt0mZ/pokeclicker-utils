@@ -1,137 +1,65 @@
-/* eslint-disable arrow-body-style */
-import { Observable, Computed } from 'knockout';
-import WeatherType from './WeatherType';
-import WeatherCondition from './WeatherCondition';
-import GameHelper from '../GameHelper';
-import { Region } from '../GameConstants';
-import PokemonType from '../enums/PokemonType';
-import SeededRand from '../utilities/SeededRand';
+import { find, upperFirst } from 'lodash';
+import { addDays, addHours, eachHourOfInterval, getHours, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns';
 
-export default class Weather {
-    public static regionalWeather: Observable<WeatherType>[] = Array<WeatherType>(GameHelper.enumLength(Region)).fill(WeatherType.Clear).map((v) => ko.observable<WeatherType>(v));
+import SeededRand from '../utils/SeededRand';
 
-    public static currentWeather: Computed<WeatherType> = ko.pureComputed(() => {
-        const weather = Weather.regionalWeather[player.region]();
+import { Region, WeatherType } from './types';
+import { WeatherCondition, weatherConditions } from './WeatherCondition';
+import { weatherDistribution } from './WeatherDistribution';
 
-        // TODO: HLXII - Add weather overrides
+const regionalWeather = Array<WeatherType>(Object.keys(Region).length / 2 - 2).fill(WeatherType.Clear);
 
-        return weather;
-    });
+const period = 4;
 
-    public static image: Computed<string> = ko.pureComputed(() => {
-        return `assets/images/weather/${WeatherType[Weather.currentWeather()]}.png`;
-    });
+const allWeathersDistrib: WeatherType[] = Object.keys(WeatherType).map(Number).filter((k) => !Number.isNaN(k));
 
-    public static color: Computed<string> = ko.pureComputed(() => {
-        return Weather.weatherConditions[Weather.currentWeather()].color;
-    });
+export interface Weather {
+  startDate: Date,
+  endDate: Date,
+  region: Region,
+  regionName: string,
+  weather: WeatherCondition
+}
 
-    public static tooltip: Computed<string> = ko.pureComputed(() => {
-        return Weather.weatherConditions[Weather.currentWeather()].tooltip;
-    });
+function resetHMS(date: Date) {
+  const tmpDate = setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0);
+  return setHours(tmpDate, getHours(tmpDate) - (getHours(tmpDate) % period));
+}
 
-    public static weatherConditions: { [weather in WeatherType]?: WeatherCondition } = {
-        [WeatherType.Clear]:
-            new WeatherCondition(WeatherType.Clear, '#ffe57a', 'The weather is clear and pleasant.', 30),
-        [WeatherType.Overcast]:
-            new WeatherCondition(WeatherType.Overcast, '#bed8ff', 'Clouds fill the skies.', 15,
-                [{ type: PokemonType.Normal, multiplier: 1.1 }]),
-        [WeatherType.Rain]:
-            new WeatherCondition(WeatherType.Rain, '#9db7f5', 'It\'s rainy and humid.', 10,
-                [{ type: PokemonType.Water, multiplier: 1.1 }, { type: PokemonType.Bug, multiplier: 1.05 }]),
-        [WeatherType.Thunderstorm]:
-            new WeatherCondition(WeatherType.Thunderstorm, '#a19288', 'It\'s currently raining heavily with thunder.', 5,
-                [{ type: PokemonType.Electric, multiplier: 1.1 }, { type: PokemonType.Water, multiplier: 1.1 }, { type: PokemonType.Fire, multiplier: 0.9 }]),
-        [WeatherType.Snow]:
-            new WeatherCondition(WeatherType.Snow, '#bbe6e6', 'It\'s cold and snowing.', 5,
-                [{ type: PokemonType.Ice, multiplier: 1.05 }]),
-        [WeatherType.Hail]:
-            new WeatherCondition(WeatherType.Hail, '#74e6e6', 'It\'s cold and hailing.', 3,
-                [{ type: PokemonType.Ice, multiplier: 1.1 }]),
-        [WeatherType.Blizzard]:
-            new WeatherCondition(WeatherType.Blizzard, '#98d8d8', 'A howling blizzard blows.', 2,
-                [{ type: PokemonType.Ice, multiplier: 1.2 }, { type: PokemonType.Fire, multiplier: 0.9 }, { type: PokemonType.Grass, multiplier: 0.9 }]),
-        [WeatherType.Sunny]:
-            new WeatherCondition(WeatherType.Sunny, '#f5ac78', 'The sunlight is strong.', 10,
-                [{ type: PokemonType.Fire, multiplier: 1.2 }, { type: PokemonType.Grass, multiplier: 1.1 }, { type: PokemonType.Water, multiplier: 0.9 }]),
-        [WeatherType.Sandstorm]:
-            new WeatherCondition(WeatherType.Sandstorm, '#d1c07d', 'A sandstorm is raging.', 10,
-                [{ type: PokemonType.Rock, multiplier: 1.1 }, { type: PokemonType.Ground, multiplier: 1.1 }, { type: PokemonType.Steel, multiplier: 1.1 }]),
-        [WeatherType.Fog]:
-            new WeatherCondition(WeatherType.Fog, '#d2c2ef', 'The fog is deep...', 10,
-                [{ type: PokemonType.Ghost, multiplier: 1.2 }, { type: PokemonType.Dark, multiplier: 1.1 }, { type: PokemonType.Electric, multiplier: 0.9 }]),
-        [WeatherType.Windy]:
-            new WeatherCondition(WeatherType.Windy, '#81c4ca', 'Mysterious strong winds blow.', 1,
-                [{ type: PokemonType.Flying, multiplier: 1.2 }, { type: PokemonType.Dragon, multiplier: 1.1 }]),
-    };
+export function generateForcast(): Weather[] {
+  const date = resetHMS(new Date);
+  const interval = { start: date, end: addDays(date, 30) };
+  const dates = eachHourOfInterval(interval, { step: 4 })
 
-    /**
-     * The probability distribution for Weather conditions
-     */
-    public static weatherDistribution: { [region in Region]?: WeatherType[] } = {
-        [Region.kanto]: [
-            WeatherType.Clear,
-            WeatherType.Overcast,
-            WeatherType.Rain,
-            WeatherType.Thunderstorm,
-            WeatherType.Sunny,
-        ],
-        [Region.johto]: [
-            WeatherType.Clear,
-            WeatherType.Overcast,
-            WeatherType.Rain,
-            WeatherType.Thunderstorm,
-            WeatherType.Snow,
-            WeatherType.Hail,
-            WeatherType.Blizzard,
-            WeatherType.Sunny,
-        ],
-        [Region.hoenn]: [
-            WeatherType.Clear,
-            WeatherType.Overcast,
-            WeatherType.Rain,
-            WeatherType.Thunderstorm,
-            WeatherType.Snow,
-            WeatherType.Hail,
-            WeatherType.Blizzard,
-            WeatherType.Sunny,
-            WeatherType.Sandstorm,
-        ],
-        [Region.sinnoh]: [
-            WeatherType.Clear,
-            WeatherType.Overcast,
-            WeatherType.Rain,
-            WeatherType.Thunderstorm,
-            WeatherType.Snow,
-            WeatherType.Hail,
-            WeatherType.Blizzard,
-            WeatherType.Sunny,
-            WeatherType.Sandstorm,
-            WeatherType.Fog,
-        ],
-    };
+  const allWeathers = dates.flatMap((date) => generateWeathers(date))
 
-    /**
-     * The period for Weather changes (in hours)
-     */
-    public static period = 4;
-
-    /**
-     * Generates the current Weather condition
-     * @param date The current date
-     */
-    public static generateWeather(date: Date): void {
-        SeededRand.seedWithDateHour(date, this.period);
-
-        Weather.regionalWeather.forEach((weather: Observable<WeatherType>, region: Region) => {
-            // If no distribution set, assume all weather available
-            const dist = Weather.weatherDistribution[region] || GameHelper.enumNumbers(WeatherType);
-
-            // Select weather based on weighted odds
-            const selectedWeather = SeededRand.fromWeightedArray(dist, dist.map((w) => Weather.weatherConditions[w].weight));
-
-            // Set selected weather or Clear if failed
-            weather(selectedWeather || WeatherType.Clear);
-        });
+  const nextWeathers = allWeathersDistrib.map((dist) => find<Weather>(allWeathers, (w) => w.weather.type === dist));
+  const res: Weather[] = [];
+  nextWeathers.forEach((w) => {
+    if (w !== undefined) {
+      res.push(w);
     }
+  })
+  return res;
+}
+
+export function generateWeathers(date: Date): Weather[] {
+  SeededRand.seedWithDateHour(date, period);
+
+  return regionalWeather.map((...[, region]: [WeatherType, Region]) => {
+    // If no distribution set, assume all weather available
+    const dist = weatherDistribution[region] || allWeathersDistrib;
+
+    // Select weather based on weighted odds
+    const selectedWeather = SeededRand.fromWeightedArray(dist, dist.map((w) => weatherConditions[w].weight));
+
+    // Set selected weather or Clear if failed
+    return {
+      startDate: date,
+      endDate: addHours(date, period),
+      region,
+      regionName: upperFirst(Region[region]),
+      weather: weatherConditions[selectedWeather || WeatherType.Clear],
+    }
+  });
 }
