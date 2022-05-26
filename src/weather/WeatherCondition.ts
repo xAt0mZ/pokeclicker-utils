@@ -1,4 +1,6 @@
-import { PokemonType, WeatherType } from './types';
+import { PokemonType } from '../pokemon/pokemonType';
+
+import {WeatherType } from './types';
 
 export class WeatherCondition {
   constructor(

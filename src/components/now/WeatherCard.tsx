@@ -1,5 +1,7 @@
-import { Card } from 'react-bootstrap';
+import { Card, Col, Container, Image, Row, Stack } from 'react-bootstrap';
 
+import { PokemonType } from '../../pokemon/pokemonType';
+import { generateTypeImage } from '../../pokemon/utils';
 import { generateWeatherImagePath } from '../../weather/utils';
 import { Weather } from '../../weather/Weather';
 
@@ -9,12 +11,29 @@ interface Props {
 
 export function WeatherCard({ weather }: Props) {
   return (
-    <Card className="text-center">
-      <Card.Header as="h5">{weather.regionName}</Card.Header>
+    <Card>
+      <Card.Header as="h5">
+        <Stack direction="horizontal">
+          {weather.regionName}
+          <Image src={generateWeatherImagePath(weather.weather.type)} width="40px" className="ms-auto" />
+        </Stack>
+      </Card.Header>
+      <Card.Header className="text-center">{weather.weather.name}</Card.Header>
       <Card.Body>
-        <Card.Img variant="top" src={generateWeatherImagePath(weather.weather.type)} />
+        <Container>
+          {weather.weather.multipliers.length > 0 &&
+            weather.weather.multipliers.map((w) => (
+              <Row className="align-items-center">
+                <Col>
+                  <Image src={generateTypeImage(w.type)} />{PokemonType[w.type]}
+                </Col>
+                <Col>x {w.multiplier}</Col>
+              </Row>
+            ))
+          }
+          {weather.weather.multipliers.length === 0 && "No bonus"}
+        </Container>
       </Card.Body>
-      <Card.Footer>{weather.weather.name}</Card.Footer>
     </Card>
   )
 }
