@@ -10,7 +10,7 @@ interface Props {
 
 export function WeatherNow({ weathers }: Props) {
   return (
-    <Row xs={1} md={4} className="g-1" style={{ maxHeight: '50vh', height: '50vh' }}>
+    <Row xs={1} md={4} className="g-3">
       {
         weathers.map((w, i) => (
           <Col key={i}>

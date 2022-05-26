@@ -11,10 +11,10 @@ export function WeatherCard({ weather }: Props) {
   return (
     <Card className="text-center">
       <Card.Header as="h5">{weather.regionName}</Card.Header>
-      <Card.Img variant="top" src={generateWeatherImagePath(weather.weather.type)} />
       <Card.Body>
-        <Card.Title>{ weather.weather.name }</Card.Title>
+        <Card.Img variant="top" src={generateWeatherImagePath(weather.weather.type)} />
       </Card.Body>
+      <Card.Footer>{weather.weather.name}</Card.Footer>
     </Card>
   )
 }
