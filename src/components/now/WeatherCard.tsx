@@ -1,9 +1,8 @@
 import { Card, Col, Container, Image, Row, Stack } from 'react-bootstrap';
 
-import { PokemonType } from '../../pokemon/pokemonType';
-import { generateTypeImage } from '../../pokemon/utils';
 import { generateWeatherImagePath } from '../../weather/utils';
 import { Weather } from '../../weather/Weather';
+import { Badge } from '../badge/Badge';
 
 interface Props {
   weather: Weather
@@ -22,10 +21,10 @@ export function WeatherCard({ weather }: Props) {
       <Card.Body>
         <Container>
           {weather.weather.multipliers.length > 0 &&
-            weather.weather.multipliers.map((w) => (
-              <Row className="align-items-center">
-                <Col>
-                  <Image src={generateTypeImage(w.type)} />{PokemonType[w.type]}
+            weather.weather.multipliers.map((w, idx) => (
+              <Row className="align-items-center" key={idx}>
+                <Col xs={8}>
+                  <Badge type={w.type} />
                 </Col>
                 <Col>x {w.multiplier}</Col>
               </Row>

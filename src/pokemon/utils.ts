@@ -1,5 +1,5 @@
 import { PokemonType } from './pokemonType';
 
-export function generateTypeImage(type: PokemonType){
+export function generateGemImagePath(type: PokemonType){
   return `/assets/images/gems/${PokemonType[type]} Gem.png`
 }

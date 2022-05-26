@@ -1,4 +1,4 @@
-export const TypeColor = [
+export const PokemonTypeColor = [
   '#A8A77A', // Normal
   '#EE8130', // Fire
   '#6390F0', // Water
