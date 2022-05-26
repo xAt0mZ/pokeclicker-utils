@@ -1,41 +1,23 @@
 :root {
-  --gray: black;
   --white: #fff;
+  --light-gray: #f7f7f7;
+  --dark-gray: #dadada;
+  --black: black;
 }
 
 .nav-pills .nav-link {
-  color: var(--gray);
-  border-color: var(--gray);
-
-  /* --bs-btn-color: #6c757d; */
-  /* --bs-btn-border-color: #6c757d; */
-  /* --bs-btn-hover-color: #fff; */
-  /* --bs-btn-hover-bg: #6c757d;
-  --bs-btn-hover-border-color: #6c757d; */
-  /* --bs-btn-focus-shadow-rgb: 108,117,125;
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #6c757d;
-  --bs-btn-active-border-color: #6c757d;
-  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #6c757d;
-  --bs-btn-disabled-bg: transparent;
-  --bs-gradient: none; */
+  color: var(--black);
+  border-color: var(--white);
+  border-style: solid;
+  border-width: 1px;
 }
 
-.nav-pills .nav-link:hover {
-  color: var(--white);
-  background-color: var(--gray);
-  border-color: var(--gray);
-}
-
-.nav-pills .nav-link:focus {
-  box-shadow: rgb(108, 117, 125);
-}
-
-.nav-pills .nav-link.active {
-  color: var(--white);
-  background-color: var(--gray);
-  border-color: var(--gray);
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-
+.nav-pills .nav-link.active,
+.nav-pills .nav-link:hover,
+.nav-pills .nav-link:focus{
+  color: var(--black);
+  background-color: var(--light-gray);
+  border-color: var(--dark-gray);
+  border-style: solid;
+  border-width: 1px;
 }

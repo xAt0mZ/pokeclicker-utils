@@ -17,8 +17,8 @@ export function WeatherCard({ weather }: Props) {
         <Card.Title>{weather.regionName}</Card.Title>
         <Card.Subtitle>---</Card.Subtitle>
         <Card.Text>
-          {format(weather.startDate, "dd/MM/yyyy hh:mm")}<br />
-          {format(weather.endDate, "dd/MM/yyyy hh:mm")}
+          {format(weather.startDate, "dd/MM/yyyy HH:mm")}<br />
+          {format(weather.endDate, "dd/MM/yyyy HH:mm")}
         </Card.Text>
       </Card.Body>
     </Card>
