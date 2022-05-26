@@ -1,4 +1,6 @@
-import { Region, WeatherType } from './types';
+import { Region } from '../region/types';
+
+import { WeatherType } from './types';
 
 export const weatherDistribution: { [region in Region]?: WeatherType[] } = {
   [Region.kanto]: [

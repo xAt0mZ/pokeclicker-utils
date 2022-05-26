@@ -2,8 +2,9 @@ import { find, upperFirst } from 'lodash';
 import { addDays, addHours, eachHourOfInterval, getHours, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns';
 
 import SeededRand from '../utils/SeededRand';
+import { Region } from '../region/types';
 
-import { Region, WeatherType } from './types';
+import { WeatherType } from './types';
 import { WeatherCondition, weatherConditions } from './WeatherCondition';
 import { weatherDistribution } from './WeatherDistribution';
 
