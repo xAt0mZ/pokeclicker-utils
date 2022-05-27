@@ -34,13 +34,22 @@ export function WeatherCard({ weathers, region }: Props) {
       {weathers.map(([date, dayWeathers], dIdx) => (
         <Row key={dIdx} className="align-items-center g-0">
           <Col xs={2}>{date}</Col>
-          {dayWeathers.map((w, i) => (
-            <Col key={i}>
-              <Image src={generateWeatherImagePath(w.weather.type)} width="35px" />
-            </Col>
-          ))}
+          {Array.from({ length: 6 }).map((_, idx) => {
+            const i = idx - 6 + dayWeathers.length;
+            if (i < 0) {
+              return (
+                <Col key={idx}>-</Col>
+              )
+            }
+            return (
+              <Col key={idx}>
+                <Image src={generateWeatherImagePath(dayWeathers[i].weather.type)} width="35px" />
+              </Col>
+            )
+          })}
         </Row>
-      ))}
-    </Card>
+      ))
+      }
+    </Card >
   )
 }

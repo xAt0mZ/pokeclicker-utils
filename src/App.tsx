@@ -31,8 +31,8 @@ export function App() {
   }, [forecast])
 
   return (
-    <Container style={{ maxWidth: '120vh' }}>
-      <Tabs variant="pills" defaultActiveKey="now" id="tabs" className="my-3 nav-fill">
+    <Container className="my-3">
+      <Tabs variant="pills" defaultActiveKey="now" id="tabs" className="mb-3 nav-fill">
         <Tab eventKey="now" title="Weather now">
           <WeatherNow weathers={weathers} />
         </Tab>
