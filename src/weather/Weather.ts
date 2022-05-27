@@ -1,18 +1,19 @@
-import { find, upperFirst } from 'lodash';
+import { compact, upperFirst } from 'lodash';
 import { addDays, addHours, eachHourOfInterval, getHours, setHours, setMilliseconds, setMinutes, setSeconds } from 'date-fns';
 
 import SeededRand from '../utils/SeededRand';
-import { Region } from '../region/types';
+import { Region, RegionsCount } from '../region/types';
 
 import { WeatherType } from './types';
 import { WeatherCondition, weatherConditions } from './WeatherCondition';
 import { weatherDistribution } from './WeatherDistribution';
 
-const regionalWeather = Array<WeatherType>(Object.keys(Region).length / 2 - 2).fill(WeatherType.Clear);
+const regionalWeather = Array<WeatherType>(RegionsCount).fill(WeatherType.Clear);
 
+// same weather for <period> hours
 const period = 4;
 
-const allWeathersDistrib: WeatherType[] = Object.keys(WeatherType).map(Number).filter((k) => !Number.isNaN(k));
+export const allWeathersDistrib: WeatherType[] = Object.keys(WeatherType).map(Number).filter((k) => !Number.isNaN(k));
 
 export interface Weather {
   startDate: Date,
@@ -22,26 +23,22 @@ export interface Weather {
   weather: WeatherCondition
 }
 
+export type DateWeather = [string, Weather[]];
+export type RegionWeather = [string, DateWeather[]];
+
 function resetHMS(date: Date) {
   const tmpDate = setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0);
   return setHours(tmpDate, getHours(tmpDate) - (getHours(tmpDate) % period));
 }
 
-export function generateForcast(): Weather[] {
+export function generateForcast() {
   const date = resetHMS(new Date);
   const interval = { start: date, end: addDays(date, 30) };
   const dates = eachHourOfInterval(interval, { step: 4 })
 
   const allWeathers = dates.flatMap((date) => generateWeathers(date))
 
-  const nextWeathers = allWeathersDistrib.map((dist) => find<Weather>(allWeathers, (w) => w.weather.type === dist));
-  const res: Weather[] = [];
-  nextWeathers.forEach((w) => {
-    if (w !== undefined) {
-      res.push(w);
-    }
-  })
-  return res;
+  return compact(allWeathers);
 }
 
 export function generateWeathers(date: Date): Weather[] {

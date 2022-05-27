@@ -1,6 +1,6 @@
 import { Row, Col } from 'react-bootstrap';
 
-import { Weather } from '../../weather/Weather';
+import { Weather } from '../../../weather/Weather';
 
 import { WeatherCard } from './WeatherCard';
 
@@ -8,7 +8,7 @@ interface Props {
   weathers: Weather[]
 }
 
-export function WeatherForecast({ weathers }: Props) {
+export function WeathersForecast({ weathers }: Props) {
   return (
     <Row xs={1} md={6} className="g-3">
       {

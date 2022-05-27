@@ -11,13 +11,15 @@ interface Props {
 export function WeatherCard({ weather }: Props) {
   return (
     <Card>
-      <Card.Header as="h5">
+      <Card.Header as="h5" className="text-center">
+        {weather.regionName}
+      </Card.Header>
+      <Card.Header>
         <Stack direction="horizontal">
-          {weather.regionName}
-          <Image src={generateWeatherImagePath(weather.weather.type)} width="40px" className="ms-auto" />
+          <span className="m-auto">{weather.weather.name}</span>
+          <Image src={generateWeatherImagePath(weather.weather.type)} width="40px" className="m-auto" />
         </Stack>
       </Card.Header>
-      <Card.Header className="text-center">{weather.weather.name}</Card.Header>
       <Card.Body>
         <Container>
           {weather.weather.multipliers.length > 0 &&

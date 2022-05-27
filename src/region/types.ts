@@ -11,3 +11,5 @@ export enum Region {
   // Throws an error if no region after the final region
   final = 8,
 }
+
+export const RegionsCount = Object.keys(Region).length / 2 - 2;
